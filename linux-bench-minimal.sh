@@ -116,7 +116,7 @@ setup()
 Update_Install_Debian()
 {
 	apt-get update
-	apt-get -y install build-essential libx11-dev libglu-dev hardinfo sysbench unzip expect php7.0-curl php7.0-common php7.0-cli php7.0-gd libfpdi-php gfortran curl
+	apt-get -y install build-essential libx11-dev libglu1-mesa-dev hardinfo sysbench unzip expect php-curl php-common php-cli php-gd gfortran curl
 	mkdir -p /usr/tmp/
 	rm /etc/apt/sources.list.d/linuxbench.list
 }
@@ -132,7 +132,7 @@ whichdistro()
 	DIST="Debian"
 	PSUEDONAME=`cat /etc/debian_version`
 	REV=""
-	
+
 	if [ `grep DISTRIB_ID= /etc/lsb-release | cut -d"=" -f2` = "Ubuntu" ] ; then
 		DIST="Ubuntu"
 		UBUNTU_RELEASE=`lsb_release -sc`

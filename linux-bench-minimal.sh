@@ -128,61 +128,20 @@ whichdistro()
 	OS=`uname -s`
 	REV=`uname -r`
 	MACH=`uname -m`
-	if [ -f /.dockerinit ]; then
-    		echo "Docker Version";
-	fi
-	if [ "${OS}" = "SunOS" ] ; then
-		OS=Solaris
-		DIST=Solaris
-		ARCH=`uname -p`	
-		OSSTR="${OS} ${REV}(${ARCH} `uname -v`)"
-	elif [ "${OS}" = "AIX" ] ; then
-		DIST=AIX
-		OSSTR="${OS} `oslevel` (`oslevel -r`)"
-		
-	elif [ "${OS}" = "Linux" ] ; then
-		KERNEL=`uname -r`
-	
-		if [ -f /etc/redhat-release ] ; then
-			DIST='RedHat'
-			PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
-			
-		elif [ -f /etc/centos-release ] ; then
-			DIST='CentOS'
-			PSUEDONAME=`cat /etc/centos-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/centos-release | sed s/.*release\ // | sed s/\ .*//`
-			
-		elif [ -f /etc/SuSE-release ] ; then
-			DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
-			REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
-			
-		elif [ -f /etc/mandrake-release ] ; then
-			DIST='Mandrake'
-			PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
-			
-		elif [ -f /etc/debian_version ] ; then
-			DIST="Debian"
-			PSUEDONAME=`cat /etc/debian_version`
-				REV=""
-			if [ `grep DISTRIB_ID= /etc/lsb-release | cut -d"=" -f2` = "Ubuntu" ] ; then
-				DIST="Ubuntu"
-				UBUNTU_RELEASE=`lsb_release -sc`
-				REPO1="deb http://us.archive.ubuntu.com/ubuntu/ "
-				REPO1END=" universe"
-				echo $REPO1 $UBUNTU_RELEASE $REPO1END > /etc/apt/sources.list.d/linuxbench.list
-			fi
 
-		elif [ -f /etc/UnitedLinux-release ] ; then
-			DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
-		
-		else 
-			DIST='Not detected'	
-		fi
-		
-		OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
+	DIST="Debian"
+	PSUEDONAME=`cat /etc/debian_version`
+	REV=""
+	
+	if [ `grep DISTRIB_ID= /etc/lsb-release | cut -d"=" -f2` = "Ubuntu" ] ; then
+		DIST="Ubuntu"
+		UBUNTU_RELEASE=`lsb_release -sc`
+		REPO1="deb http://us.archive.ubuntu.com/ubuntu/ "
+		REPO1END=" universe"
+		echo $REPO1 $UBUNTU_RELEASE $REPO1END > /etc/apt/sources.list.d/linuxbench.list
 	fi
+	
+	OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
 }
 
 

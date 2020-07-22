@@ -26,6 +26,7 @@
 
 #Current Version
 rev='12.19'
+libraryBaseUri='https://github.com/benyoungnz/linux-bench/raw/master/libraries'
 
 version()
 {
@@ -266,8 +267,8 @@ ubench()
 {
 	cd $benchdir
 	echo "Building UnixBench"
-	wget -N http://files.linux-bench.com/lb/UnixBench5.1.3.tgz 
-	wget -N http://files.linux-bench.com/lb/fix-limitation.patch 
+	wget -N $libraryBaseUri/UnixBench5.1.3.tgz 
+	wget -N $libraryBaseUri/fix-limitation.patch 
 	tar -zxf UnixBench5.1.3.tgz
 	
 	cd UnixBench 
@@ -290,7 +291,7 @@ cray()
 	apptgz=c-ray-1.1.gz
 	tgzstring=xfz
 	appbin=$appbase/c-ray-mt
-	appdlpath=http://files.linux-bench.com/lb/$apptgz
+	appdlpath=$libraryBaseUri/$apptgz
 	extract
 	
 	echo "Running C-Ray test"
@@ -359,7 +360,7 @@ OSSL()
 crafty()
 {
 	cd $benchdir
-   	wget -N http://www.craftychess.com/crafty-23.4.zip
+   	wget -N $libraryBaseUri/crafty-23.4.zip
    	unzip -o crafty-23.4.zip
    	cd crafty-23.4/
    	export target=LINUX
@@ -398,7 +399,7 @@ red()
 	tar xzf redis-stable.tar.gz && cd redis-stable && make install
 	cp utils/redis_init_script /etc/init.d/redis_6379
 	mkdir -p /var/redis/6379
-	wget http://files.linux-bench.com/lb/6379.conf
+	wget $libraryBaseUri/6379.conf
 	mkdir -p /etc/redis
 	cp ./6379.conf /etc/redis
 
@@ -445,7 +446,7 @@ NPB()
 
 	apptgz=NPB3.3.1.tar.gz
 	appbin=NPB3.3.1/NPB3.3-OMP
-	appdlpath=http://files.linux-bench.com/lb/$apptgz
+	appdlpath=$libraryBaseUri/$apptgz
 	tgzstring=xfz
 	extract
 	
@@ -490,14 +491,14 @@ NAMD()
 	apptgz=NAMD_2.9_Linux-x86_64-multicore.tar.gz
 	tgzstring=xfz
 	appbin=$appbase/namd2
-	appdlpath=http://files.linux-bench.com/lb/$apptgz
+	appdlpath=$libraryBaseUri/$apptgz
 	extract
 	
 	appbase=apoa1
 	apptgz=apoa1.tar.gz
 	tgzstring=xfz
 	appbin=$appbase/apoa1.pdb
-	appdlpath=http://files.linux-bench.com/lb/$apptgz
+	appdlpath=$libraryBaseUri/$apptgz
 	extract
 
 	echo "Using" $threads "threads"
@@ -522,7 +523,7 @@ p7zip()
 	apptgz=p7zip_9.20.1_src_all.tar.bz2
 	tgzstring=xfj
 	appbin=p7zip_9.20.1/bin/7za
-	appdlpath=http://files.linux-bench.com/lb/$apptgz
+	appdlpath=$libraryBaseUri/$apptgz
 	extract
 
 	echo "Building p7zip"

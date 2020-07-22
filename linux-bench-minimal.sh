@@ -128,7 +128,9 @@ whichdistro()
 	OS=`uname -s`
 	REV=`uname -r`
 	MACH=`uname -m`
-
+	if [ -f /.dockerinit ]; then
+    		echo "Docker Version";
+	fi
 	if [ "${OS}" = "SunOS" ] ; then
 		OS=Solaris
 		DIST=Solaris
@@ -141,6 +143,25 @@ whichdistro()
 	elif [ "${OS}" = "Linux" ] ; then
 		KERNEL=`uname -r`
 	
+		if [ -f /etc/redhat-release ] ; then
+			DIST='RedHat'
+			PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
+			REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
+			
+		elif [ -f /etc/centos-release ] ; then
+			DIST='CentOS'
+			PSUEDONAME=`cat /etc/centos-release | sed s/.*\(// | sed s/\)//`
+			REV=`cat /etc/centos-release | sed s/.*release\ // | sed s/\ .*//`
+			
+		elif [ -f /etc/SuSE-release ] ; then
+			DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
+			REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
+			
+		elif [ -f /etc/mandrake-release ] ; then
+			DIST='Mandrake'
+			PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
+			REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
+			
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian"
 			PSUEDONAME=`cat /etc/debian_version`
@@ -155,7 +176,7 @@ whichdistro()
 
 		elif [ -f /etc/UnitedLinux-release ] ; then
 			DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
-			
+		
 		else 
 			DIST='Not detected'	
 		fi

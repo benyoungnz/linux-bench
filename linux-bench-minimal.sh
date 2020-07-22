@@ -121,15 +121,6 @@ Update_Install_Debian()
 }
 
 
-# Update and install required packages (CentOS/RHEL)
-Update_Install_RHEL()
-{
-	rpm -Uhv http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-	rpm -Uhv http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el6.rf.x86_64.rpm
-	yum -y groupinstall "Development Tools" && yum -y install wget sysbench unzip libX11 perl-Time-HiRes mesa-libGLU hardinfo expect php-common glibc.i686 gfortran curl
-}
-
-
 # Detects which OS and if it is Linux then it will detect which Linux Distribution.
 whichdistro() 
 {
@@ -149,25 +140,6 @@ whichdistro()
 	elif [ "${OS}" = "Linux" ] ; then
 		KERNEL=`uname -r`
 	
-		if [ -f /etc/redhat-release ] ; then
-			DIST='RedHat'
-			PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
-			
-		elif [ -f /etc/centos-release ] ; then
-			DIST='CentOS'
-			PSUEDONAME=`cat /etc/centos-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/centos-release | sed s/.*release\ // | sed s/\ .*//`
-			
-		elif [ -f /etc/SuSE-release ] ; then
-			DIST=`cat /etc/SuSE-release | tr "\n" ' '| sed s/VERSION.*//`
-			REV=`cat /etc/SuSE-release | tr "\n" ' ' | sed s/.*=\ //`
-			
-		elif [ -f /etc/mandrake-release ] ; then
-			DIST='Mandrake'
-			PSUEDONAME=`cat /etc/mandrake-release | sed s/.*\(// | sed s/\)//`
-			REV=`cat /etc/mandrake-release | sed s/.*release\ // | sed s/\ .*//`
-			
 		elif [ -f /etc/debian_version ] ; then
 			DIST="Debian"
 			PSUEDONAME=`cat /etc/debian_version`
@@ -198,10 +170,6 @@ dlDependancies()
 	if [ -f /.dockerinit ] ; then
 	echo "In a Docker container, no updates run."
 	VIRTUAL="TRUE"
-	elif [ "${DIST}" = "CentOS" ] ; then
-	Update_Install_RHEL
-	elif [ "${DIST}" = "RedHat" ] ; then
-	Update_Install_RHEL
 	elif [ "${DIST}" = "Debian" ] || [ "${DIST}" = "Ubuntu" ] ; then
 	Update_Install_Debian
 	fi
@@ -663,18 +631,18 @@ done
 
 push_data() {
   ref=$(date +%S%d$i%s)
-  echo "ref_link: $ref"
-  echo "See your results online at: http://linux-bench.com/display/$ref"
+#   echo "ref_link: $ref"
+#   echo "See your results online at: http://linux-bench.com/display/$ref"
   mkdir tmpbench && cp $log tmpbench/.
   sleep 1s
 #  curl -F file="@./tmpbench/$log" http://parser.linux-bench.com:3000/java-process/uploader -H "Connection: close"
-  curl --form file="@./tmpbench/$log" --form press=Upload http://beta.linux-bench.com/upload_file/ --trace-ascii dumpfile
+  #curl --form file="@./tmpbench/$log" --form press=Upload http://beta.linux-bench.com/upload_file/ --trace-ascii dumpfile
   
 #Adding new script targets
-  curl --form file="@./tmpbench/$log" --form press=Upload http://linux-bench.com/upload_file/ --trace-ascii dumpfile
+  #curl --form file="@./tmpbench/$log" --form press=Upload http://linux-bench.com/upload_file/ --trace-ascii dumpfile
 #  curl -F file="@./tmpbench/$log" http://linux-bench.com:3000/java-process/uploader -H "Connection: close"
-  rm -rf ./tmpbench/
-  echo "ref_link: $ref"
+  #rm -rf ./tmpbench/
+  #echo "ref_link: $ref"
 }
 
 # Execute everything in the script

@@ -312,31 +312,6 @@ stream()
 	rm -rf stream-me stream.c
 }
 
-# OpenSSL
-OSSL()
-{
-	cd $benchdir
-	
-	appbase=openssl-1.0.1g
-	apptgz=openssl-1.0.1g.tar.gz
-	tgzstring=xfz
-	appbin=$appbase/apps/openssl
-	appdlpath=http://www.openssl.org/source/$apptgz
-	extract
-
-	cd openssl-1.0.1g/
-	echo "Building OpenSSL"
-	./config no-zlib 2>&1 >> /dev/null
-	make 2>&1 >> /dev/null
-	echo "Running OpenSSL test"
- 	./apps/openssl speed rsa4096 -multi $nproc
-	
-	cd $benchdir
-	rm -rf openssl*
-
-	
-}
-
 crafty()
 {
 	cd $benchdir
@@ -376,12 +351,12 @@ red()
 	echo "Building Redis"
 
 	wget http://download.redis.io/redis-stable.tar.gz
-	tar xzf redis-stable.tar.gz && cd redis-stable && make install
-	cp utils/redis_init_script /etc/init.d/redis_6379
-	mkdir -p /var/redis/6379
+	tar xzf redis-stable.tar.gz && cd redis-stable && sudo make install
+	sudo cp utils/redis_init_script /etc/init.d/redis_6379
+	sudo mkdir -p /var/redis/6379
 	wget $libraryBaseUri/6379.conf
-	mkdir -p /etc/redis
-	cp ./6379.conf /etc/redis
+	sudo mkdir -p /etc/redis
+	sudo cp ./6379.conf /etc/redis
 
 	service redis_6379 start
 
@@ -538,16 +513,14 @@ runBenches()
 		time cray
 		echo "stream"
 		time stream
-		echo "OSSL"
-		time OSSL  
 		echo "sysbench"
 		time sysb 
 		echo "redis"
 		time red
 		echo "NPB"
 		time NPB
-		echo "NAMD" 
-		time NAMD
+		# echo "NAMD" 
+		# time NAMD
 		echo "p7zip"
 		time p7zip
 #		let iterations-=1

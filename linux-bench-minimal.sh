@@ -68,7 +68,6 @@ OPTIONS:
 
 ENVIRONMENT VARIABLES:
 
-VIRTUAL = If unset, value is FALSE. Set to TRUE if running virtualized (automatically set for Docker)
 
 EOF
 }
@@ -191,7 +190,7 @@ sysinfo()
 	else 
 		lscpu;
 	fi
-	: ${VIRTUAL:=FALSE}
+	: ${VIRTUAL:=TRUE}
 	echo "VIRTUAL="$VIRTUAL
 
 

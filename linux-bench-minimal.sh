@@ -485,8 +485,6 @@ runBenches()
 #	while [ $iterations -gt 0 ] ; do
 		echo "hardinfo"  
 		time hardi
-		echo "ubench"
-		time ubench
 		echo "cray"
 		time cray
 		echo "stream"
@@ -499,6 +497,8 @@ runBenches()
 		time diskbenchy
 		echo "p7zip"
 		time p7zip
+		echo "ubench"
+		time ubench
 #		let iterations-=1
 #	done
 	

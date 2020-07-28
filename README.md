@@ -2,7 +2,7 @@
 
 ### Run example
 ```bash
-sudo wget https://raw.githubusercontent.com/benyoungnz/linux-bench/master/linux-bench-minimal.sh && chmod +x linux-bench-minimal.sh && ./linux-bench-minimal.sh
+sudo wget https://raw.githubusercontent.com/benyoungnz/linux-bench/master/linux-bench-minimal.sh && sudo chmod +x linux-bench-minimal.sh && sudo ./linux-bench-minimal.sh
 ```
 
 ### Changes made from STH version

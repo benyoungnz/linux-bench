@@ -116,7 +116,7 @@ setup()
 Update_Install_Debian()
 {
 	apt-get update
-	apt-get -y install build-essential libx11-dev libglu1-mesa-dev hardinfo sysbench unzip expect php-curl php-common php-cli php-gd gfortran curl
+	apt-get -y install build-essential libx11-dev libglu1-mesa-dev hardinfo sysbench unzip expect php-curl php-common php-cli php-gd gfortran curl hdparm fio
 	mkdir -p /usr/tmp/
 	rm /etc/apt/sources.list.d/linuxbench.list
 }
@@ -256,7 +256,8 @@ ubench()
 	make -j$(nproc)
 	patch Run fix-limitation.patch
 	echo "Running UnixBench"
-	./Run dhry2reg whetstone-double
+	# ./Run dhry2reg whetstone-double
+	./Run
 	cd $benchdir
 	rm -rf UnixBench* fix-limitation.patch
 	
@@ -285,6 +286,35 @@ cray()
 	cd $benchdir
 	rm -rf $appbase*
 	
+}
+
+diskbenchy()
+{
+
+	echo ${iterations:=5} passes
+	while [ $iterations -gt 0 ] ; do
+	
+		echo "WRITE speed of a disk (iteration ${iterations})"
+		sync; dd if=/dev/zero of=tempfile bs=1M count=2048; sync
+		echo "WRITE speed of a disk"
+		dd if=tempfile of=/dev/null bs=1M count=2048
+		echo "Clear the cache and accurately measure the real READ speed directly from the disk"
+		/sbin/sysctl -w vm.drop_caches=3
+		dd if=tempfile of=/dev/null bs=1M count=2048
+		let iterations-=1
+
+	done
+
+	echo "FIO testing"
+	echo "4 GB file, and perform 4KB reads and writes using a 75%/25% - 3:1 ration rough approximation of a database"
+	fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=test --bs=4k --iodepth=64 --size=4G --readwrite=randrw --rwmixread=75
+	echo "Random reads"
+	fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=test --bs=4k --iodepth=64 --size=4G --readwrite=randread
+	echo "Random writes"
+	fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=test --bs=4k --iodepth=64 --size=4G --readwrite=randwrite
+	
+	echo "IOPING testing"
+	ioping -c 20 .
 }
 
 # STREAM by Dr. John D. McCalpin
@@ -342,57 +372,6 @@ sysb()
    	echo "Running sysbench CPU Multi-Threaded"
    	sysbench --num-threads=$nproc --test=cpu --cpu-max-prime=300000 run
 }
-
-
-# redis Benchmark based on feedback. Next step is to add memchached as seen here: http://oldblog.antirez.com/post/redis-memcached-benchmark.html
-red()
-{
-	cd $benchdir
-	echo "Building Redis"
-
-	wget http://download.redis.io/redis-stable.tar.gz
-	tar xzf redis-stable.tar.gz && cd redis-stable && sudo make install
-	sudo cp utils/redis_init_script /etc/init.d/redis_6379
-	sudo mkdir -p /var/redis/6379
-	wget $libraryBaseUri/6379.conf
-	sudo mkdir -p /etc/redis
-	sudo cp ./6379.conf /etc/redis
-
-	service redis_6379 start
-
-   	# Original redis benchmark set/ get test
-
-	echo "Running Redis test"
-	redis-benchmark -n 1000000 -t set,get -P 32 -q -c 200
-
-	BIN=redis-benchmark
-
-	payload=32
-	iterations=10000
-	keyspace=100000
-
-	for clients in 1 5 10 25 50 75 100
-	do
-		SPEED=0
-		for dummy in 0 1 2
-			do
-				S=$($BIN -n $iterations -r $keyspace -d $payload -c $clients | grep 'per second' | tail -1 | awk '{print $1}')
-				VALUE=$(echo $S | awk '{printf "%.0f",$1}')
-				if [ $(($VALUE > $SPEED)) != 0 ]
-					then
-					SPEED=$VALUE
-				fi
-			done
-		echo "$clients $SPEED"
-	done
-
-	redis-cli shutdown
-	
-	cd $benchdir
-	rm -rf redis* /etc/redis /var/redis* /usr/local/bin/redis-* /etc/init.d/redis_*
-
-}
-
 
 # NPB Benchmarks
 NPB()
@@ -515,12 +494,10 @@ runBenches()
 		time stream
 		echo "sysbench"
 		time sysb 
-		echo "redis"
-		time red
 		echo "NPB"
 		time NPB
-		# echo "NAMD" 
-		# time NAMD
+		echo "diskbency" 
+		time diskbenchy
 		echo "p7zip"
 		time p7zip
 #		let iterations-=1

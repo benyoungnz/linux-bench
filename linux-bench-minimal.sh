@@ -173,7 +173,7 @@ extract()
 	elif [ -e ./$apptgz ] ; then
 		tar $tgzstring $apptgz
 	else
-		wget $appdlpath
+		wget -q $appdlpath
 		tar $tgzstring $apptgz
 	fi
 }
@@ -246,13 +246,13 @@ ubench()
 {
 	cd $benchdir
 	echo "Building UnixBench"
-	wget -N $libraryBaseUri/UnixBench5.1.3.tgz 
-	wget -N $libraryBaseUri/fix-limitation.patch 
+	wget -q -N $libraryBaseUri/UnixBench5.1.3.tgz 
+	wget -q -N $libraryBaseUri/fix-limitation.patch 
 	tar -zxf UnixBench5.1.3.tgz
 	
 	cd UnixBench 
 	mv ../fix-limitation.patch .	
-	make -j$(nproc)
+	make -s -j$(nproc)
 	patch Run fix-limitation.patch
 	echo "Running UnixBench"
 	# ./Run dhry2reg whetstone-double
@@ -305,7 +305,7 @@ diskbenchy()
 	done
 
 	echo "FIO testing"
-	echo "4 GB file, and perform 4KB reads and writes using a 75%/25% - 3:1 ration rough approximation of a database"
+	echo "4 GB file, and perform 4KB reads and writes using a 75%/25% - 3:1 ratio rough approximation of a database"
 	fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=test --bs=4k --iodepth=64 --size=4G --readwrite=randrw --rwmixread=75
 	echo "Random reads"
 	fio --randrepeat=1 --ioengine=libaio --direct=1 --gtod_reduce=1 --name=test --filename=test --bs=4k --iodepth=64 --size=4G --readwrite=randread
@@ -325,7 +325,7 @@ stream()
 	if [ -e stream.c ] ; then
 		echo "Stream downloaded"
 	else
-		wget -N http://www.cs.virginia.edu/stream/FTP/Code/stream.c
+		wget -q -N http://www.cs.virginia.edu/stream/FTP/Code/stream.c
 	fi
 
 	gcc stream.c -O3 -march=native -fopenmp -o stream-me
@@ -344,14 +344,14 @@ stream()
 crafty()
 {
 	cd $benchdir
-   	wget -N $libraryBaseUri/crafty-23.4.zip
+   	wget -q -N $libraryBaseUri/crafty-23.4.zip
    	unzip -o crafty-23.4.zip
    	cd crafty-23.4/
    	export target=LINUX
    	export CFLAGS="-Wall -pipe -O3 -fomit-frame-pointer $CFLAGS"
    	export CXFLAGS="-Wall -pipe -O3 -fomit-frame-pointer"
    	export LDFLAGS="$LDFLAGS -lstdc++"
-   	make crafty-make
+   	make -s crafty-make
    	chmod +x crafty
    	./crafty bench end
 	
@@ -401,7 +401,7 @@ NPB()
 	#echo "ua A" >> config/suite.def
 	#echo "dc A" >> config/suite.def
 
-	make suite
+	make -s suite
 
 	export OMP_NUM_THREADS=$cores
 
@@ -461,7 +461,7 @@ p7zip()
 
 	echo "Building p7zip"
 	cd $appbase
-	make 2>&1 >> /dev/null
+	make -s 2>&1 >> /dev/null
 
 	echo "Starting 7zip benchmark, this will take a while"
 	bin/7za b >> output.txt

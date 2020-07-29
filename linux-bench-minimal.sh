@@ -115,7 +115,7 @@ setup()
 Update_Install_Debian()
 {
 	apt-get update
-	apt-get -y install build-essential libx11-dev libglu1-mesa-dev hardinfo sysbench unzip expect php-curl php-common php-cli php-gd gfortran curl hdparm fio
+	apt-get -y install build-essential libx11-dev libglu1-mesa-dev hardinfo sysbench unzip expect php-curl php-common php-cli php-gd gfortran curl hdparm fio ioping
 	mkdir -p /usr/tmp/
 	rm /etc/apt/sources.list.d/linuxbench.list
 }
@@ -295,7 +295,7 @@ diskbenchy()
 	
 		echo "WRITE speed of a disk (iteration ${iterations})"
 		sync; dd if=/dev/zero of=tempfile bs=1M count=2048; sync
-		echo "WRITE speed of a disk"
+		echo "READ speed of a disk"
 		dd if=tempfile of=/dev/null bs=1M count=2048
 		echo "Clear the cache and accurately measure the real READ speed directly from the disk"
 		/sbin/sysctl -w vm.drop_caches=3
